@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Fluent API Benchmark Test</title>
+</head>
+<body>
+
+    <h1>Fluent API Benchmark Test</h1>
+
+    <div id="results"></div>
+
+    <script>
+        var count = 10000000;
+
+        var MyClass = function(a) {
+            this.a = a;
+        }
+
+        MyClass.prototype.foo = function(b) {
+            // Do some complex work
+            this.a += Math.cos(b);
+            return this;
+        }
+
+        MyClass.prototype.foo2 = function (b) {
+            // Do some complex work
+            this.a += Math.cos(b);
+        }
+
+        var obj = new MyClass(5);
+        performance.mark("startFirst");
+        obj.foo(1).foo(2).foo(3);
+        for (var index = 0; index < count; index++) {
+            obj.foo(1).foo(2).foo(3);
+        }
+        performance.mark("endFirst");
+
+        var obj2 = new MyClass(5);
+        performance.mark("startSecond");
+        for (var index = 0; index < count; index++) {
+            obj2.foo2(1);
+            obj2.foo2(2);
+            obj2.foo2(3);
+        }
+        performance.mark("endSecond");
+
+        performance.measure("first", "startFirst", "endFirst");
+        performance.measure("second", "startSecond", "endSecond");
+
+        var div = document.getElementById("results");
+
+        div.innerHTML += ": With return this: " + performance.getEntriesByType("measure")[0].duration + "ms<BR>";
+        div.innerHTML += ": Without return this: " + performance.getEntriesByType("measure")[1].duration + "ms";
+    </script>
+
+</body>
+</html>
